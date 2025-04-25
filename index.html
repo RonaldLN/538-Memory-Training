@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>同义替换训练器</title>
+    <title>同义替换训练</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -94,7 +94,7 @@
     </style>
 </head>
 <body>
-    <div class="dataset-tag" id="datasetTag">当前数据集：A</div>
+    <div class="dataset-tag" id="datasetTag">第 1 & 2 类考点词</div>
     <div class="current-words" id="currentWords"></div>
     <div class="marker-buttons">
         <button class="marker-btn" onclick="selectMarker(1)">标记单词1</button>
@@ -104,888 +104,2422 @@
     <div class="options-grid" id="optionsGrid"></div>
     
     <div class="button-group">
-        <button onclick="checkAnswers()" id="submitBtn">提交答案</button>
+        <button onclick="checkAnswers()" id="submitBtn">验证答案</button>
         <button onclick="prepareBatch()" id="nextBtn" style="display: none;">下一组</button>
     </div>
     <div class="button-group">
-        <button class="dataset-switcher" onclick="switchDataset()">切换至数据集B</button>
+        <button class="dataset-switcher" onclick="switchDataset()">训练第 3 类考点词</button>
     </div>
 
     <script>
         // 两套独立的数据集
         const datasets = {
             A: {
-            "resemble": {
-                "词义": "v. 像，与……相似",
-                "同义替换": [
-                    "like",
-                    "look like",
-                    "be similar to"
-                ]
-            },
-            "recognize": {
-                "词义": "v. 认出，识别；承认",
-                "同义替换": [
-                    "perceive",
-                    "acknowledge",
-                    "realize",
-                    "appreciate",
-                    "admit",
-                    "identify",
-                    "comprehend",
-                    "understand",
-                    "know"
-                ]
-            },
-            "adjust": {
-                "词义": "v. 调整，使适合",
-                "同义替换": [
-                    "change",
-                    "modify",
-                    "shift",
-                    "alter"
-                ]
-            },
-            "approach": {
-                "词义": "n. 方法",
-                "同义替换": [
-                    "method",
-                    "way"
-                ]
-            },
-            "fundamental": {
-                "词义": "adj. 基本的，基础的",
-                "同义替换": [
-                    "rudimentary",
-                    "preliminary",
-                    "basic"
-                ]
-            },
-            "rely on": {
-                "词义": " 依靠，依赖",
-                "同义替换": [
-                    "depend on"
-                ]
-            },
-            "domestic": {
-                "词义": "adj. 家庭的；国内的",
-                "同义替换": [
-                    "home",
-                    "local",
-                    "national"
-                ]
-            },
-            "measure": {
-                "词义": "v. 测量",
-                "同义替换": [
-                    "calculate",
-                    "assess",
-                    "evaluate"
-                ]
-            },
-            "trait": {
-                "词义": "n. 特性，特征",
-                "同义替换": [
-                    "characteristic",
-                    "feature",
-                    "property"
-                ]
-            },
-            "coin": {
-                "词义": "v. 创造",
-                "同义替换": [
-                    "first used",
-                    "invent"
-                ]
-            },
-            "artificial": {
-                "词义": "adj. 人造的，仿造的",
-                "同义替换": [
-                    "synthetic",
-                    "man-made"
-                ]
-            },
-            "prompt": {
-                "词义": "v. 促进，激起",
-                "同义替换": [
-                    "initiate",
-                    "immediately"
-                ]
-            },
-            "exchange": {
-                "词义": "v. 交换",
-                "同义替换": [
-                    "share",
-                    "apply A to B"
-                ]
-            },
-            "underlie": {
-                "词义": "v. 成为……基础",
-                "同义替换": [
-                    "based on",
-                    "ground",
-                    "root"
-                ]
-            },
-            "ignore": {
-                "词义": "v. 忽视，不顾",
-                "同义替换": [
-                    "neglect",
-                    "overlook",
-                    "underestimate"
-                ]
-            },
-            "fertiliser": {
-                "词义": "n. 化肥，肥料",
-                "同义替换": [
-                    "chemical",
-                    "toxic",
-                    "unnatural"
-                ]
-            },
-            "that*": {
-                "词义": "pron. 那；那个",
-                "同义替换": [
-                    "this",
-                    "it",
-                    "they",
-                    "those",
-                    "these",
-                    "such"
-                ]
-            },
-            "and*": {
-                "词义": "conj. 和，而且",
-                "同义替换": [
-                    "or",
-                    "as well as",
-                    "both…and",
-                    "not only…but also…",
-                    "other than",
-                    "in addition",
-                    "besides",
-                    "on the one hand…on the other hand…",
-                    "neither…nor…"
-                ]
-            },
-            "rather than*": {
-                "词义": " 而非，不是",
-                "同义替换": [
-                    "but",
-                    "yet",
-                    "however",
-                    "whereas",
-                    "nonetheless",
-                    "nevertheless",
-                    "although",
-                    "notwithstanding",
-                    "though",
-                    "instead"
-                ]
-            },
-            "thanks to*": {
-                "词义": " 由于，幸亏",
-                "同义替换": [
-                    "stem from",
-                    "derive",
-                    "owing to",
-                    "due to",
-                    "according to",
-                    "because of",
-                    "on account of",
-                    "as a result of",
-                    "leading to",
-                    "because",
-                    "since",
-                    "for",
-                    "in that",
-                    "as",
-                    "therefore",
-                    "hence"
-                ]
-            },
-            "diversity": {
-                "词义": "n. 多样性，差异",
-                "同义替换": [
-                    "variety",
-                    "difference"
-                ]
-            },
-            "detect": {
-                "词义": "v. 查明，发现",
-                "同义替换": [
-                    "find",
-                    "look for",
-                    "seek",
-                    "search"
-                ]
-            },
-            "isolate": {
-                "词义": "v. 使隔离，使孤立",
-                "同义替换": [
-                    "inaccessible"
-                ]
-            },
-            "avoid": {
-                "词义": "v. 避免",
-                "同义替换": [
-                    "escape",
-                    "evitable"
-                ]
-            },
-            "budget": {
-                "词义": "n. 预算",
-                "同义替换": [
-                    "fund",
-                    "financial"
-                ]
-            },
-            "adapt to": {
-                "词义": " 使适应",
-                "同义替换": [
-                    "fit",
-                    "suit"
-                ]
-            },
-            "alternative": {
-                "词义": "adj./n. 供替代的，供选择的/替代品",
-                "同义替换": [
-                    "substitute"
-                ]
-            },
-            "compensate": {
-                "词义": "n. 补偿，赔偿",
-                "同义替换": [
-                    "make up",
-                    "offset"
-                ]
-            },
-            "component": {
-                "词义": "n. 成分，要素",
-                "同义替换": [
-                    "proportion"
-                ]
-            },
-            "military": {
-                "词义": "adj. 军事的",
-                "同义替换": [
-                    "weapon",
-                    "army"
-                ]
-            },
-            "criteria": {
-                "词义": "n. 标准",
-                "同义替换": [
-                    "standard"
-                ]
-            },
-            "curriculum": {
-                "词义": "n. 课程",
-                "同义替换": [
-                    "syllabus",
-                    "course of study"
-                ]
-            },
-            "feasible": {
-                "词义": "adj. 可行的",
-                "同义替换": [
-                    "realistic",
-                    "viable"
-                ]
-            },
-            "constrain": {
-                "词义": "v. 束缚，限制",
-                "同义替换": [
-                    "stop",
-                    "control"
-                ]
-            },
-            "deficiency": {
-                "词义": "n. 缺陷，缺点",
-                "同义替换": [
-                    "shortage",
-                    "defect",
-                    "weakness"
-                ]
-            },
-            "supplement": {
-                "词义": "v. 补充",
-                "同义替换": [
-                    "provision"
-                ]
-            },
-            "distinguish": {
-                "词义": "v. 区别，辨别",
-                "同义替换": [
-                    "separate",
-                    "differentiate"
-                ]
-            },
-            "analyze": {
-                "词义": "v. 分析，解释",
-                "同义替换": [
-                    "examine",
-                    "diagnose"
-                ]
-            },
-            "emphasize": {
-                "词义": "v. 强调，着重",
-                "同义替换": [
-                    "focus on",
-                    "stress"
-                ]
-            },
-            "enormous": {
-                "词义": "adj. 庞大的，巨大的",
-                "同义替换": [
-                    "massive",
-                    "large"
-                ]
-            },
-            "imitate": {
-                "词义": "v. 模仿",
-                "同义替换": [
-                    "mimic",
-                    "copy"
-                ]
-            },
-            "impair": {
-                "词义": "v. 削弱，减少",
-                "同义替换": [
-                    "damage",
-                    "diminish",
-                    "decrease"
-                ]
-            },
-            "hinder": {
-                "词义": "v. 阻碍",
-                "同义替换": [
-                    "impede",
-                    "prevent",
-                    "deter",
-                    "obstacle"
-                ]
-            },
-            "legitimate": {
-                "词义": "adj. 合法的",
-                "同义替换": [
-                    "legal"
-                ]
-            },
-            "limitation": {
-                "词义": "n. 限制",
-                "同义替换": [
-                    "restriction"
-                ]
-            },
-            "convention": {
-                "词义": "n. 手法；习俗",
-                "同义替换": [
-                    "method; tradition"
-                ]
-            },
-            "demanding": {
-                "词义": "adj. 苛求的",
-                "同义替换": [
-                    "troublesome"
-                ]
-            },
-            "determine": {
-                "词义": "v. 决定",
-                "同义替换": [
-                    "decide"
-                ]
-            },
-            "accelerate": {
-                "词义": "v. 加速，促进；强调",
-                "同义替换": [
-                    "speed up"
-                ]
-            },
-            "ancient": {
-                "词义": "adj. 古代的;古老的",
-                "同义替换": [
-                    "aged",
-                    "old"
-                ]
-            },
-            "beneficial": {
-                "词义": "adj. 有益的",
-                "同义替换": [
-                    "helpful",
-                    "advantageous",
-                    "wholesome"
-                ]
-            },
-            "chronic": {
-                "词义": "adj. 慢性的，长期性的",
-                "同义替换": [
-                    "lasting"
-                ]
-            },
-            "conscious": {
-                "词义": "adj. 有意识的，神志清醒的",
-                "同义替换": [
-                    "aware",
-                    "knowing"
-                ]
-            },
-            "minimize": {
-                "词义": "v. 最小化，使……减少到最少",
-                "同义替换": [
-                    "reduce",
-                    "lessen"
-                ]
-            },
-            "immunity": {
-                "词义": "n. 免疫力",
-                "同义替换": [
-                    "resistance"
-                ]
-            },
-            "imperative": {
-                "词义": "adj. 必要的，紧急的",
-                "同义替换": [
-                    "compelling",
-                    "necessary",
-                    "urgent"
-                ]
-            },
-            "secrete": {
-                "词义": "v. 分泌",
-                "同义替换": [
-                    "discharge",
-                    "exude"
-                ]
-            },
-            "exaggerate": {
-                "词义": "v. 夸大，夸张",
-                "同义替换": [
-                    "overstate"
-                ]
-            },
-            "transmit": {
-                "词义": "v. 传达，传输",
-                "同义替换": [
-                    "pass",
-                    "send",
-                    "transfer"
-                ]
-            },
-            "extinct": {
-                "词义": "v. 灭绝",
-                "同义替换": [
-                    "die out",
-                    "lost"
-                ]
-            },
-            "exclusive": {
-                "词义": "adj. 独有的；排外的；专一的",
-                "同义替换": [
-                    "only"
-                ]
-            },
-            "guarantee": {
-                "词义": "v. 保证，担保",
-                "同义替换": [
-                    "assure"
-                ]
-            },
-            "inherit": {
-                "词义": "v. 继承",
-                "同义替换": [
-                    "receive"
-                ]
-            },
-            "witness": {
-                "词义": "n. 见证，证据；目击者",
-                "同义替换": [
-                    "view",
-                    "see"
-                ]
-            },
-            "magnetic": {
-                "词义": "adj. 有磁性的",
-                "同义替换": [
-                    "attractive"
-                ]
-            },
-            "loss": {
-                "词义": "n. 减少；亏损；失败；遗失的",
-                "同义替换": [
-                    "waste",
-                    "gone"
-                ]
-            },
-            "option": {
-                "词义": "n. 选择",
-                "同义替换": [
-                    "choice"
-                ]
-            },
-            "prefer to": {
-                "词义": " 更喜欢",
-                "同义替换": [
-                    "rather"
-                ]
-            },
-            "priority": {
-                "词义": "n. 优先权",
-                "同义替换": [
-                    "preference",
-                    "preferential"
-                ]
-            },
-            "primary": {
-                "词义": "adj. 主要的",
-                "同义替换": [
-                    "principle",
-                    "main"
-                ]
-            },
-            "principle": {
-                "词义": "n. 原理",
-                "同义替换": [
-                    "rule"
-                ]
-            },
-            "potential": {
-                "词义": "n. 潜能/adj.潜在的",
-                "同义替换": [
-                    "possibility"
-                ]
-            },
-            "quantity": {
-                "词义": "n. 量，数量",
-                "同义替换": [
-                    "number"
-                ]
-            },
-            "settle": {
-                "词义": "v. 解决；定居，稳定",
-                "同义替换": [
-                    "fix",
-                    "figure out"
-                ]
-            },
-            "sophisticate": {
-                "词义": "v. 使复杂",
-                "同义替换": [
-                    "complicate"
-                ]
-            },
-            "specific": {
-                "词义": "adj. 明确的；特殊的",
-                "同义替换": [
-                    "detailed",
-                    "particular"
-                ]
-            },
-            "survive": {
-                "词义": "v. 存活，幸存",
-                "同义替换": [
-                    "remain"
-                ]
-            },
-            "swift": {
-                "词义": "adj. 迅速的，敏捷的，立刻的",
-                "同义替换": [
-                    "quick",
-                    "rapid"
-                ]
-            },
-            "unexpectedly": {
-                "词义": "adv. 出乎意料的",
-                "同义替换": [
-                    "surprising"
-                ]
-            },
-            "surrounding": {
-                "词义": "n. 环境",
-                "同义替换": [
-                    "setting",
-                    "environment"
-                ]
-            },
-            "attempt": {
-                "词义": "n. 试图，尝试",
-                "同义替换": [
-                    "try",
-                    "test"
-                ]
-            },
-            "expertise": {
-                "词义": "n. 专门技术",
-                "同义替换": [
-                    "knowledge",
-                    "skill"
-                ]
-            },
-            "faculty": {
-                "词义": "n. 能力，才能；全体教员",
-                "同义替换": [
-                    "ability"
-                ]
-            },
-            "donate": {
-                "词义": "v. 捐赠",
-                "同义替换": [
-                    "contribute"
-                ]
-            },
-            "dynamics": {
-                "词义": "n. 动力学",
-                "同义替换": [
-                    "energy",
-                    "force",
-                    "move"
-                ]
-            },
-            "incentive": {
-                "词义": "n. 刺激,鼓励;动机",
-                "同义替换": [
-                    "motive",
-                    "stimulus"
-                ]
-            },
-            "mortality": {
-                "词义": "n. 死亡率",
-                "同义替换": [
-                    "death"
-                ]
-            },
-            "peripheral": {
-                "词义": "adj. 外围的，次要的",
-                "同义替换": [
-                    "unimportant",
-                    "minor"
-                ]
-            },
-            "vicinity": {
-                "词义": "n. 邻近，附近",
-                "同义替换": [
-                    "neighbourhood",
-                    "nearby"
-                ]
-            },
-            "threaten": {
-                "词义": "v. 威胁，危及",
-                "同义替换": [
-                    "endanger",
-                    "jeopardize",
-                    "risk",
-                    "hazard"
-                ]
-            },
-            "practice": {
-                "词义": "n. 行；练习",
-                "同义替换": [
-                    "method",
-                    "exercise"
-                ]
-            },
-            "bacteria": {
-                "词义": "n. 细菌",
-                "同义替换": [
-                    "virus",
-                    "germ",
-                    "microbe"
-                ]
-            },
-            "be subject to": {
-                "词义": " 受…...支配",
-                "同义替换": [
-                    "face"
-                ]
-            },
-            "be liable to": {
-                "词义": " 易于……",
-                "同义替换": [
-                    "potential"
-                ]
-            },
-            "innate": {
-                "词义": "adj. 天生的；内在的，直觉的",
-                "同义替换": [
-                    "built-in",
-                    "inborn"
-                ]
-            },
-            "pattern": {
-                "词义": "n. 模式",
-                "同义替换": [
-                    "formation"
-                ]
-            },
-            "therapy": {
-                "词义": "n. 治疗，理疗",
-                "同义替换": [
-                    "treatment"
-                ]
-            },
-            "original": {
-                "词义": "adj. 原始的,最初的",
-                "同义替换": [
-                    "initial",
-                    "fist"
-                ]
-            },
-            "confidential": {
-                "词义": "adj. 机密的,秘密的",
-                "同义替换": [
-                    "undisclosed",
-                    "secret",
-                    "hidden"
-                ]
-            },
-            "cognitive": {
-                "词义": "adj. 认知的",
-                "同义替换": [
-                    "mental"
-                ]
-            },
-            "comply with": {
-                "词义": " 照做，遵守",
-                "同义替换": [
-                    "obey"
-                ]
-            },
-            "consult": {
-                "词义": "v .查阅,商量,请教,咨询",
-                "同义替换": [
-                    "ask for advice"
-                ]
-            },
-            "superior": {
-                "词义": "adj. 上级的;优秀的",
-                "同义替换": [
-                    "higher",
-                    "upper"
-                ]
-            },
-            "co-operation": {
-                "词义": "n. 合作，协作",
-                "同义替换": [
-                    "support",
-                    "work together"
-                ]
-            },
-            "co-ordinate": {
-                "词义": "v. 使……协调",
-                "同义替换": [
-                    "organize",
-                    "harmonize"
-                ]
-            },
-            "differ": {
-                "词义": "v. 使……相异；使……不同",
-                "同义替换": [
-                    "vary"
-                ]
-            },
-            "cue": {
-                "词义": "n. 线索",
-                "同义替换": [
-                    "hint",
-                    "clue"
-                ]
-            },
-            "signal": {
-                "词义": "n. 信号",
-                "同义替换": [
-                    "symbol",
-                    "mark",
-                    "sign"
-                ]
-            },
-            "abandon": {
-                "词义": "v. 放弃，遗弃",
-                "同义替换": [
-                    "quit",
-                    "give up",
-                    "forsake",
-                    "derelict"
-                ]
-            },
-            "halt": {
-                "词义": "n. 停止",
-                "同义替换": [
-                    "stop",
-                    "quit"
-                ]
-            },
-            "fragile": {
-                "词义": "adj. 脆弱的",
-                "同义替换": [
-                    "vulnerable"
-                ]
-            },
-            "retain": {
-                "词义": "v. 记住",
-                "同义替换": [
-                    "maintain"
-                ]
-            },
-            "vanish": {
-                "词义": "n. 消失，绝迹",
-                "同义替换": [
-                    "disappear"
-                ]
-            },
-            "delivery": {
-                "词义": "n. 递送",
-                "同义替换": [
-                    "send"
-                ]
-            },
-            "erode": {
-                "词义": "v. 侵蚀",
-                "同义替换": [
-                    "rust",
-                    "damage"
-                ]
-            },
-            "induce": {
-                "词义": "v. 引起，引诱",
-                "同义替换": [
-                    "cause",
-                    "lead to"
-                ]
-            },
-            "stable": {
-                "词义": "adj. 稳定的",
-                "同义替换": [
-                    "constant",
-                    "unchanged"
-                ]
-            },
-            "integrate": {
-                "词义": "v. 使……成整体",
-                "同义替换": [
-                    "combine",
-                    "whole"
-                ]
-            },
-            "equal": {
-                "词义": "adj. 平等的 ; 相等的；胜任的",
-                "同义替换": [
-                    "fair",
-                    "even"
-                ]
-            },
-            "grant": {
-                "词义": "v. 拨款；授予",
-                "同义替换": [
-                    "offer"
-                ]
-            }
+                "resemble": {
+                    "词义": "v. 像，与……相似",
+                    "同义替换": [
+                        "like",
+                        "look like",
+                        "be similar to"
+                    ]
+                },
+                "recognize": {
+                    "词义": "v. 认出，识别；承认",
+                    "同义替换": [
+                        "perceive",
+                        "acknowledge",
+                        "realize",
+                        "appreciate",
+                        "admit",
+                        "identify",
+                        "comprehend",
+                        "understand",
+                        "know"
+                    ]
+                },
+                "adjust": {
+                    "词义": "v. 调整，使适合",
+                    "同义替换": [
+                        "change",
+                        "modify",
+                        "shift",
+                        "alter"
+                    ]
+                },
+                "approach": {
+                    "词义": "n. 方法",
+                    "同义替换": [
+                        "method",
+                        "way"
+                    ]
+                },
+                "fundamental": {
+                    "词义": "adj. 基本的，基础的",
+                    "同义替换": [
+                        "rudimentary",
+                        "preliminary",
+                        "basic"
+                    ]
+                },
+                "rely on": {
+                    "词义": " 依靠，依赖",
+                    "同义替换": [
+                        "depend on"
+                    ]
+                },
+                "domestic": {
+                    "词义": "adj. 家庭的；国内的",
+                    "同义替换": [
+                        "home",
+                        "local",
+                        "national"
+                    ]
+                },
+                "measure": {
+                    "词义": "v. 测量",
+                    "同义替换": [
+                        "calculate",
+                        "assess",
+                        "evaluate"
+                    ]
+                },
+                "trait": {
+                    "词义": "n. 特性，特征",
+                    "同义替换": [
+                        "characteristic",
+                        "feature",
+                        "property"
+                    ]
+                },
+                "coin": {
+                    "词义": "v. 创造",
+                    "同义替换": [
+                        "first used",
+                        "invent"
+                    ]
+                },
+                "artificial": {
+                    "词义": "adj. 人造的，仿造的",
+                    "同义替换": [
+                        "synthetic",
+                        "man-made"
+                    ]
+                },
+                "prompt": {
+                    "词义": "v. 促进，激起",
+                    "同义替换": [
+                        "initiate",
+                        "immediately"
+                    ]
+                },
+                "exchange": {
+                    "词义": "v. 交换",
+                    "同义替换": [
+                        "share",
+                        "apply A to B"
+                    ]
+                },
+                "underlie": {
+                    "词义": "v. 成为……基础",
+                    "同义替换": [
+                        "based on",
+                        "ground",
+                        "root"
+                    ]
+                },
+                "ignore": {
+                    "词义": "v. 忽视，不顾",
+                    "同义替换": [
+                        "neglect",
+                        "overlook",
+                        "underestimate"
+                    ]
+                },
+                "fertiliser": {
+                    "词义": "n. 化肥，肥料",
+                    "同义替换": [
+                        "chemical",
+                        "toxic",
+                        "unnatural"
+                    ]
+                },
+                "that*": {
+                    "词义": "pron. 那；那个",
+                    "同义替换": [
+                        "this",
+                        "it",
+                        "they",
+                        "those",
+                        "these",
+                        "such"
+                    ]
+                },
+                "and*": {
+                    "词义": "conj. 和，而且",
+                    "同义替换": [
+                        "or",
+                        "as well as",
+                        "both…and",
+                        "not only…but also…",
+                        "other than",
+                        "in addition",
+                        "besides",
+                        "on the one hand…on the other hand…",
+                        "neither…nor…"
+                    ]
+                },
+                "rather than*": {
+                    "词义": " 而非，不是",
+                    "同义替换": [
+                        "but",
+                        "yet",
+                        "however",
+                        "whereas",
+                        "nonetheless",
+                        "nevertheless",
+                        "although",
+                        "notwithstanding",
+                        "though",
+                        "instead"
+                    ]
+                },
+                "thanks to*": {
+                    "词义": " 由于，幸亏",
+                    "同义替换": [
+                        "stem from",
+                        "derive",
+                        "owing to",
+                        "due to",
+                        "according to",
+                        "because of",
+                        "on account of",
+                        "as a result of",
+                        "leading to",
+                        "because",
+                        "since",
+                        "for",
+                        "in that",
+                        "as",
+                        "therefore",
+                        "hence"
+                    ]
+                },
+                "diversity": {
+                    "词义": "n. 多样性，差异",
+                    "同义替换": [
+                        "variety",
+                        "difference"
+                    ]
+                },
+                "detect": {
+                    "词义": "v. 查明，发现",
+                    "同义替换": [
+                        "find",
+                        "look for",
+                        "seek",
+                        "search"
+                    ]
+                },
+                "isolate": {
+                    "词义": "v. 使隔离，使孤立",
+                    "同义替换": [
+                        "inaccessible"
+                    ]
+                },
+                "avoid": {
+                    "词义": "v. 避免",
+                    "同义替换": [
+                        "escape",
+                        "evitable"
+                    ]
+                },
+                "budget": {
+                    "词义": "n. 预算",
+                    "同义替换": [
+                        "fund",
+                        "financial"
+                    ]
+                },
+                "adapt to": {
+                    "词义": " 使适应",
+                    "同义替换": [
+                        "fit",
+                        "suit"
+                    ]
+                },
+                "alternative": {
+                    "词义": "adj./n. 供替代的，供选择的/替代品",
+                    "同义替换": [
+                        "substitute"
+                    ]
+                },
+                "compensate": {
+                    "词义": "n. 补偿，赔偿",
+                    "同义替换": [
+                        "make up",
+                        "offset"
+                    ]
+                },
+                "component": {
+                    "词义": "n. 成分，要素",
+                    "同义替换": [
+                        "proportion"
+                    ]
+                },
+                "military": {
+                    "词义": "adj. 军事的",
+                    "同义替换": [
+                        "weapon",
+                        "army"
+                    ]
+                },
+                "criteria": {
+                    "词义": "n. 标准",
+                    "同义替换": [
+                        "standard"
+                    ]
+                },
+                "curriculum": {
+                    "词义": "n. 课程",
+                    "同义替换": [
+                        "syllabus",
+                        "course of study"
+                    ]
+                },
+                "feasible": {
+                    "词义": "adj. 可行的",
+                    "同义替换": [
+                        "realistic",
+                        "viable"
+                    ]
+                },
+                "constrain": {
+                    "词义": "v. 束缚，限制",
+                    "同义替换": [
+                        "stop",
+                        "control"
+                    ]
+                },
+                "deficiency": {
+                    "词义": "n. 缺陷，缺点",
+                    "同义替换": [
+                        "shortage",
+                        "defect",
+                        "weakness"
+                    ]
+                },
+                "supplement": {
+                    "词义": "v. 补充",
+                    "同义替换": [
+                        "provision"
+                    ]
+                },
+                "distinguish": {
+                    "词义": "v. 区别，辨别",
+                    "同义替换": [
+                        "separate",
+                        "differentiate"
+                    ]
+                },
+                "analyze": {
+                    "词义": "v. 分析，解释",
+                    "同义替换": [
+                        "examine",
+                        "diagnose"
+                    ]
+                },
+                "emphasize": {
+                    "词义": "v. 强调，着重",
+                    "同义替换": [
+                        "focus on",
+                        "stress"
+                    ]
+                },
+                "enormous": {
+                    "词义": "adj. 庞大的，巨大的",
+                    "同义替换": [
+                        "massive",
+                        "large"
+                    ]
+                },
+                "imitate": {
+                    "词义": "v. 模仿",
+                    "同义替换": [
+                        "mimic",
+                        "copy"
+                    ]
+                },
+                "impair": {
+                    "词义": "v. 削弱，减少",
+                    "同义替换": [
+                        "damage",
+                        "diminish",
+                        "decrease"
+                    ]
+                },
+                "hinder": {
+                    "词义": "v. 阻碍",
+                    "同义替换": [
+                        "impede",
+                        "prevent",
+                        "deter",
+                        "obstacle"
+                    ]
+                },
+                "legitimate": {
+                    "词义": "adj. 合法的",
+                    "同义替换": [
+                        "legal"
+                    ]
+                },
+                "limitation": {
+                    "词义": "n. 限制",
+                    "同义替换": [
+                        "restriction"
+                    ]
+                },
+                "convention": {
+                    "词义": "n. 手法；习俗",
+                    "同义替换": [
+                        "method; tradition"
+                    ]
+                },
+                "demanding": {
+                    "词义": "adj. 苛求的",
+                    "同义替换": [
+                        "troublesome"
+                    ]
+                },
+                "determine": {
+                    "词义": "v. 决定",
+                    "同义替换": [
+                        "decide"
+                    ]
+                },
+                "accelerate": {
+                    "词义": "v. 加速，促进；强调",
+                    "同义替换": [
+                        "speed up"
+                    ]
+                },
+                "ancient": {
+                    "词义": "adj. 古代的;古老的",
+                    "同义替换": [
+                        "aged",
+                        "old"
+                    ]
+                },
+                "beneficial": {
+                    "词义": "adj. 有益的",
+                    "同义替换": [
+                        "helpful",
+                        "advantageous",
+                        "wholesome"
+                    ]
+                },
+                "chronic": {
+                    "词义": "adj. 慢性的，长期性的",
+                    "同义替换": [
+                        "lasting"
+                    ]
+                },
+                "conscious": {
+                    "词义": "adj. 有意识的，神志清醒的",
+                    "同义替换": [
+                        "aware",
+                        "knowing"
+                    ]
+                },
+                "minimize": {
+                    "词义": "v. 最小化，使……减少到最少",
+                    "同义替换": [
+                        "reduce",
+                        "lessen"
+                    ]
+                },
+                "immunity": {
+                    "词义": "n. 免疫力",
+                    "同义替换": [
+                        "resistance"
+                    ]
+                },
+                "imperative": {
+                    "词义": "adj. 必要的，紧急的",
+                    "同义替换": [
+                        "compelling",
+                        "necessary",
+                        "urgent"
+                    ]
+                },
+                "secrete": {
+                    "词义": "v. 分泌",
+                    "同义替换": [
+                        "discharge",
+                        "exude"
+                    ]
+                },
+                "exaggerate": {
+                    "词义": "v. 夸大，夸张",
+                    "同义替换": [
+                        "overstate"
+                    ]
+                },
+                "transmit": {
+                    "词义": "v. 传达，传输",
+                    "同义替换": [
+                        "pass",
+                        "send",
+                        "transfer"
+                    ]
+                },
+                "extinct": {
+                    "词义": "v. 灭绝",
+                    "同义替换": [
+                        "die out",
+                        "lost"
+                    ]
+                },
+                "exclusive": {
+                    "词义": "adj. 独有的；排外的；专一的",
+                    "同义替换": [
+                        "only"
+                    ]
+                },
+                "guarantee": {
+                    "词义": "v. 保证，担保",
+                    "同义替换": [
+                        "assure"
+                    ]
+                },
+                "inherit": {
+                    "词义": "v. 继承",
+                    "同义替换": [
+                        "receive"
+                    ]
+                },
+                "witness": {
+                    "词义": "n. 见证，证据；目击者",
+                    "同义替换": [
+                        "view",
+                        "see"
+                    ]
+                },
+                "magnetic": {
+                    "词义": "adj. 有磁性的",
+                    "同义替换": [
+                        "attractive"
+                    ]
+                },
+                "loss": {
+                    "词义": "n. 减少；亏损；失败；遗失的",
+                    "同义替换": [
+                        "waste",
+                        "gone"
+                    ]
+                },
+                "option": {
+                    "词义": "n. 选择",
+                    "同义替换": [
+                        "choice"
+                    ]
+                },
+                "prefer to": {
+                    "词义": " 更喜欢",
+                    "同义替换": [
+                        "rather"
+                    ]
+                },
+                "priority": {
+                    "词义": "n. 优先权",
+                    "同义替换": [
+                        "preference",
+                        "preferential"
+                    ]
+                },
+                "primary": {
+                    "词义": "adj. 主要的",
+                    "同义替换": [
+                        "principle",
+                        "main"
+                    ]
+                },
+                "principle": {
+                    "词义": "n. 原理",
+                    "同义替换": [
+                        "rule"
+                    ]
+                },
+                "potential": {
+                    "词义": "n. 潜能/adj.潜在的",
+                    "同义替换": [
+                        "possibility"
+                    ]
+                },
+                "quantity": {
+                    "词义": "n. 量，数量",
+                    "同义替换": [
+                        "number"
+                    ]
+                },
+                "settle": {
+                    "词义": "v. 解决；定居，稳定",
+                    "同义替换": [
+                        "fix",
+                        "figure out"
+                    ]
+                },
+                "sophisticate": {
+                    "词义": "v. 使复杂",
+                    "同义替换": [
+                        "complicate"
+                    ]
+                },
+                "specific": {
+                    "词义": "adj. 明确的；特殊的",
+                    "同义替换": [
+                        "detailed",
+                        "particular"
+                    ]
+                },
+                "survive": {
+                    "词义": "v. 存活，幸存",
+                    "同义替换": [
+                        "remain"
+                    ]
+                },
+                "swift": {
+                    "词义": "adj. 迅速的，敏捷的，立刻的",
+                    "同义替换": [
+                        "quick",
+                        "rapid"
+                    ]
+                },
+                "unexpectedly": {
+                    "词义": "adv. 出乎意料的",
+                    "同义替换": [
+                        "surprising"
+                    ]
+                },
+                "surrounding": {
+                    "词义": "n. 环境",
+                    "同义替换": [
+                        "setting",
+                        "environment"
+                    ]
+                },
+                "attempt": {
+                    "词义": "n. 试图，尝试",
+                    "同义替换": [
+                        "try",
+                        "test"
+                    ]
+                },
+                "expertise": {
+                    "词义": "n. 专门技术",
+                    "同义替换": [
+                        "knowledge",
+                        "skill"
+                    ]
+                },
+                "faculty": {
+                    "词义": "n. 能力，才能；全体教员",
+                    "同义替换": [
+                        "ability"
+                    ]
+                },
+                "donate": {
+                    "词义": "v. 捐赠",
+                    "同义替换": [
+                        "contribute"
+                    ]
+                },
+                "dynamics": {
+                    "词义": "n. 动力学",
+                    "同义替换": [
+                        "energy",
+                        "force",
+                        "move"
+                    ]
+                },
+                "incentive": {
+                    "词义": "n. 刺激,鼓励;动机",
+                    "同义替换": [
+                        "motive",
+                        "stimulus"
+                    ]
+                },
+                "mortality": {
+                    "词义": "n. 死亡率",
+                    "同义替换": [
+                        "death"
+                    ]
+                },
+                "peripheral": {
+                    "词义": "adj. 外围的，次要的",
+                    "同义替换": [
+                        "unimportant",
+                        "minor"
+                    ]
+                },
+                "vicinity": {
+                    "词义": "n. 邻近，附近",
+                    "同义替换": [
+                        "neighbourhood",
+                        "nearby"
+                    ]
+                },
+                "threaten": {
+                    "词义": "v. 威胁，危及",
+                    "同义替换": [
+                        "endanger",
+                        "jeopardize",
+                        "risk",
+                        "hazard"
+                    ]
+                },
+                "practice": {
+                    "词义": "n. 行；练习",
+                    "同义替换": [
+                        "method",
+                        "exercise"
+                    ]
+                },
+                "bacteria": {
+                    "词义": "n. 细菌",
+                    "同义替换": [
+                        "virus",
+                        "germ",
+                        "microbe"
+                    ]
+                },
+                "be subject to": {
+                    "词义": " 受…...支配",
+                    "同义替换": [
+                        "face"
+                    ]
+                },
+                "be liable to": {
+                    "词义": " 易于……",
+                    "同义替换": [
+                        "potential"
+                    ]
+                },
+                "innate": {
+                    "词义": "adj. 天生的；内在的，直觉的",
+                    "同义替换": [
+                        "built-in",
+                        "inborn"
+                    ]
+                },
+                "pattern": {
+                    "词义": "n. 模式",
+                    "同义替换": [
+                        "formation"
+                    ]
+                },
+                "therapy": {
+                    "词义": "n. 治疗，理疗",
+                    "同义替换": [
+                        "treatment"
+                    ]
+                },
+                "original": {
+                    "词义": "adj. 原始的,最初的",
+                    "同义替换": [
+                        "initial",
+                        "fist"
+                    ]
+                },
+                "confidential": {
+                    "词义": "adj. 机密的,秘密的",
+                    "同义替换": [
+                        "undisclosed",
+                        "secret",
+                        "hidden"
+                    ]
+                },
+                "cognitive": {
+                    "词义": "adj. 认知的",
+                    "同义替换": [
+                        "mental"
+                    ]
+                },
+                "comply with": {
+                    "词义": " 照做，遵守",
+                    "同义替换": [
+                        "obey"
+                    ]
+                },
+                "consult": {
+                    "词义": "v .查阅,商量,请教,咨询",
+                    "同义替换": [
+                        "ask for advice"
+                    ]
+                },
+                "superior": {
+                    "词义": "adj. 上级的;优秀的",
+                    "同义替换": [
+                        "higher",
+                        "upper"
+                    ]
+                },
+                "co-operation": {
+                    "词义": "n. 合作，协作",
+                    "同义替换": [
+                        "support",
+                        "work together"
+                    ]
+                },
+                "co-ordinate": {
+                    "词义": "v. 使……协调",
+                    "同义替换": [
+                        "organize",
+                        "harmonize"
+                    ]
+                },
+                "differ": {
+                    "词义": "v. 使……相异；使……不同",
+                    "同义替换": [
+                        "vary"
+                    ]
+                },
+                "cue": {
+                    "词义": "n. 线索",
+                    "同义替换": [
+                        "hint",
+                        "clue"
+                    ]
+                },
+                "signal": {
+                    "词义": "n. 信号",
+                    "同义替换": [
+                        "symbol",
+                        "mark",
+                        "sign"
+                    ]
+                },
+                "abandon": {
+                    "词义": "v. 放弃，遗弃",
+                    "同义替换": [
+                        "quit",
+                        "give up",
+                        "forsake",
+                        "derelict"
+                    ]
+                },
+                "halt": {
+                    "词义": "n. 停止",
+                    "同义替换": [
+                        "stop",
+                        "quit"
+                    ]
+                },
+                "fragile": {
+                    "词义": "adj. 脆弱的",
+                    "同义替换": [
+                        "vulnerable"
+                    ]
+                },
+                "retain": {
+                    "词义": "v. 记住",
+                    "同义替换": [
+                        "maintain"
+                    ]
+                },
+                "vanish": {
+                    "词义": "n. 消失，绝迹",
+                    "同义替换": [
+                        "disappear"
+                    ]
+                },
+                "delivery": {
+                    "词义": "n. 递送",
+                    "同义替换": [
+                        "send"
+                    ]
+                },
+                "erode": {
+                    "词义": "v. 侵蚀",
+                    "同义替换": [
+                        "rust",
+                        "damage"
+                    ]
+                },
+                "induce": {
+                    "词义": "v. 引起，引诱",
+                    "同义替换": [
+                        "cause",
+                        "lead to"
+                    ]
+                },
+                "stable": {
+                    "词义": "adj. 稳定的",
+                    "同义替换": [
+                        "constant",
+                        "unchanged"
+                    ]
+                },
+                "integrate": {
+                    "词义": "v. 使……成整体",
+                    "同义替换": [
+                        "combine",
+                        "whole"
+                    ]
+                },
+                "equal": {
+                    "词义": "adj. 平等的 ; 相等的；胜任的",
+                    "同义替换": [
+                        "fair",
+                        "even"
+                    ]
+                },
+                "grant": {
+                    "词义": "v. 拨款；授予",
+                    "同义替换": [
+                        "offer"
+                    ]
+                }
             },
             B: {
-                "achieve": {
-                    "词义": "实现，达到",
-                    "同义替换": ["accomplish", "attain", "reach"]
+                "accumulate": {
+                    "词义": "v. 积累，积聚",
+                    "同义替换": [
+                        "gather"
+                    ]
                 },
-                // 其他单词数据...
+                "addictive": {
+                    "词义": "adj. 上瘾的",
+                    "同义替换": [
+                        "habit"
+                    ]
+                },
+                "adversity": {
+                    "词义": "n. 逆境，不幸",
+                    "同义替换": [
+                        "trouble"
+                    ]
+                },
+                "aggression": {
+                    "词义": "n. 侵犯，侵害",
+                    "同义替换": [
+                        "attack"
+                    ]
+                },
+                "agreeable": {
+                    "词义": "adj. 令人愉快的；合适的；和蔼可亲的",
+                    "同义替换": [
+                        "pleasant"
+                    ]
+                },
+                "aid": {
+                    "词义": "n. 援助，帮助",
+                    "同义替换": [
+                        "help"
+                    ]
+                },
+                "allergic": {
+                    "词义": "adj. 过敏的；对……极讨厌的",
+                    "同义替换": [
+                        "irritate"
+                    ]
+                },
+                "altitude": {
+                    "词义": "n. 高度，海拔",
+                    "同义替换": [
+                        "height"
+                    ]
+                },
+                "application": {
+                    "词义": "n. 应用",
+                    "同义替换": [
+                        "utilization"
+                    ]
+                },
+                "approve": {
+                    "词义": "v. 批准",
+                    "同义替换": [
+                        "agree"
+                    ]
+                },
+                "array": {
+                    "词义": "n. 排列，大批",
+                    "同义替换": [
+                        "order"
+                    ]
+                },
+                "assign": {
+                    "词义": "v. 分配，指派",
+                    "同义替换": [
+                        "allocate"
+                    ]
+                },
+                "association": {
+                    "词义": "n. 协会，联盟；联系",
+                    "同义替换": [
+                        "union"
+                    ]
+                },
+                "attitude": {
+                    "词义": "n. 看法，态度",
+                    "同义替换": [
+                        "opinion"
+                    ]
+                },
+                "authority": {
+                    "词义": "n. 当局，权威",
+                    "同义替换": [
+                        "government"
+                    ]
+                },
+                "be consistent with": {
+                    "词义": " 与……一致",
+                    "同义替换": [
+                        "compatible"
+                    ]
+                },
+                "bear": {
+                    "词义": "v. 承担；忍受",
+                    "同义替换": [
+                        "tolerate"
+                    ]
+                },
+                "blight": {
+                    "词义": "v. 损害；枯萎",
+                    "同义替换": [
+                        "destroy"
+                    ]
+                },
+                "boundary": {
+                    "词义": "n. 边界；底线",
+                    "同义替换": [
+                        "barrier"
+                    ]
+                },
+                "bungle": {
+                    "词义": "v. 搞糟，拙劣地工作",
+                    "同义替换": [
+                        "mishandle"
+                    ]
+                },
+                "burden": {
+                    "词义": "n. 负担",
+                    "同义替换": [
+                        "load"
+                    ]
+                },
+                "calamity": {
+                    "词义": "n. 灾难",
+                    "同义替换": [
+                        "disaster"
+                    ]
+                },
+                "capacity": {
+                    "词义": "n. 容量",
+                    "同义替换": [
+                        "volume"
+                    ]
+                },
+                "catastrophic": {
+                    "词义": "adj. 灾难的",
+                    "同义替换": [
+                        "disastrous"
+                    ]
+                },
+                "cater": {
+                    "词义": "v. 迎合；满足需求",
+                    "同义替换": [
+                        "serve"
+                    ]
+                },
+                "certify": {
+                    "词义": "v. 证明，保证",
+                    "同义替换": [
+                        "verify"
+                    ]
+                },
+                "civic": {
+                    "词义": "adj. 实名的",
+                    "同义替换": [
+                        "municipal"
+                    ]
+                },
+                "comment": {
+                    "词义": "n./v. 评论；意见/评论",
+                    "同义替换": [
+                        "remark"
+                    ]
+                },
+                "commitment": {
+                    "词义": "n. 承诺，许诺，义务；致力",
+                    "同义替换": [
+                        "engagement"
+                    ]
+                },
+                "communal": {
+                    "词义": "adj. 公共的，公社的",
+                    "同义替换": [
+                        "public"
+                    ]
+                },
+                "commute": {
+                    "词义": "v. 通勤；用……交换",
+                    "同义替换": [
+                        "travel"
+                    ]
+                },
+                "compare": {
+                    "词义": "v. 与……相比较",
+                    "同义替换": [
+                        "contrast"
+                    ]
+                },
+                "conceal": {
+                    "词义": "v. 隐藏；隐瞒",
+                    "同义替换": [
+                        "hide"
+                    ]
+                },
+                "concentrate": {
+                    "词义": "v. 专心于；集中",
+                    "同义替换": [
+                        "focus"
+                    ]
+                },
+                "concur": {
+                    "词义": "v. 同意",
+                    "同义替换": [
+                        "agree"
+                    ]
+                },
+                "confer": {
+                    "词义": "v. 授予，给予",
+                    "同义替换": [
+                        "grant"
+                    ]
+                },
+                "conflict": {
+                    "词义": "n. 冲突，矛盾",
+                    "同义替换": [
+                        "unharmonious"
+                    ]
+                },
+                "confuse": {
+                    "词义": "v. 使混乱，使迷惑",
+                    "同义替换": [
+                        "puzzle"
+                    ]
+                },
+                "conservative": {
+                    "词义": "adj. 保守的",
+                    "同义替换": [
+                        "traditional"
+                    ]
+                },
+                "considerable": {
+                    "词义": "adj. 相当大的，重要的",
+                    "同义替换": [
+                        "significant"
+                    ]
+                },
+                "contingent": {
+                    "词义": "adj. 因情况而异的",
+                    "同义替换": [
+                        "uncertain"
+                    ]
+                },
+                "controversial": {
+                    "词义": "adj. 有争论的",
+                    "同义替换": [
+                        "disputable"
+                    ]
+                },
+                "correlation": {
+                    "词义": "n. 相关，关联",
+                    "同义替换": [
+                        "link"
+                    ]
+                },
+                "courtship": {
+                    "词义": "n. 求爱（时期）",
+                    "同义替换": [
+                        "mate"
+                    ]
+                },
+                "crash": {
+                    "词义": "n. 碰撞",
+                    "同义替换": [
+                        "collapse"
+                    ]
+                },
+                "credibility": {
+                    "词义": "n. 可信性",
+                    "同义替换": [
+                        "reliance"
+                    ]
+                },
+                "criminal": {
+                    "词义": "n. 罪犯，犯人",
+                    "同义替换": [
+                        "conviction"
+                    ]
+                },
+                "crisis": {
+                    "词义": "n. 危机",
+                    "同义替换": [
+                        "risk"
+                    ]
+                },
+                "criticism": {
+                    "词义": "n. 评论",
+                    "同义替换": [
+                        "condemn"
+                    ]
+                },
+                "curb": {
+                    "词义": "v. 限制，抑制",
+                    "同义替换": [
+                        "restrict"
+                    ]
+                },
+                "damp": {
+                    "词义": "adj. 潮湿的",
+                    "同义替换": [
+                        "wet"
+                    ]
+                },
+                "dazzle": {
+                    "词义": "v. 使目眩；使……眼花",
+                    "同义替换": [
+                        "flash"
+                    ]
+                },
+                "deadline": {
+                    "词义": "n. 最后期限",
+                    "同义替换": [
+                        "limit"
+                    ]
+                },
+                "delay": {
+                    "词义": "n. 延期，耽搁",
+                    "同义替换": [
+                        "postpone"
+                    ]
+                },
+                "democratic": {
+                    "词义": "adj. 民主的",
+                    "同义替换": [
+                        "republic"
+                    ]
+                },
+                "demographic": {
+                    "词义": "adj. 人口统计学的；人口学",
+                    "同义替换": [
+                        "population statistic"
+                    ]
+                },
+                "dental": {
+                    "词义": "adj. 牙科的，牙齿的",
+                    "同义替换": [
+                        "teeth"
+                    ]
+                },
+                "depression": {
+                    "词义": "n. 抑郁，沮丧",
+                    "同义替换": [
+                        "frustration"
+                    ]
+                },
+                "designate": {
+                    "词义": "n. 指定；指派，标出",
+                    "同义替换": [
+                        "appoint"
+                    ]
+                },
+                "detain": {
+                    "词义": "v. 留住",
+                    "同义替换": [
+                        "hold"
+                    ]
+                },
+                "devastate": {
+                    "词义": "v. 毁坏，毁灭",
+                    "同义替换": [
+                        "wreck"
+                    ]
+                },
+                "disclose": {
+                    "词义": "v. 公开；揭露",
+                    "同义替换": [
+                        "expose"
+                    ]
+                },
+                "disparate": {
+                    "词义": "adj. 不同的",
+                    "同义替换": [
+                        "different"
+                    ]
+                },
+                "display": {
+                    "词义": "n. 显示",
+                    "同义替换": [
+                        "show"
+                    ]
+                },
+                "disrupt": {
+                    "词义": "v. 破坏",
+                    "同义替换": [
+                        "destroy"
+                    ]
+                },
+                "distract": {
+                    "词义": "v. 转移，分心",
+                    "同义替换": [
+                        "divert"
+                    ]
+                },
+                "distribute": {
+                    "词义": "v. 分配，分发",
+                    "同义替换": [
+                        "spread"
+                    ]
+                },
+                "documentation": {
+                    "词义": "n. 文件；文献",
+                    "同义替换": [
+                        "record"
+                    ]
+                },
+                "domain": {
+                    "词义": "n. 领域",
+                    "同义替换": [
+                        "field"
+                    ]
+                },
+                "dominant": {
+                    "词义": "adj. 占优势的，占支配地位的",
+                    "同义替换": [
+                        "overbearing"
+                    ]
+                },
+                "dramatic": {
+                    "词义": "adj. 戏剧化的；激动人心的，引人注意的",
+                    "同义替换": [
+                        "striking"
+                    ]
+                },
+                "drought": {
+                    "词义": "n. 干旱",
+                    "同义替换": [
+                        "dry"
+                    ]
+                },
+                "durable": {
+                    "词义": "adj. 持久的",
+                    "同义替换": [
+                        "lasting"
+                    ]
+                },
+                "eco-friendly": {
+                    "词义": "adj. 生态有好的，环保的",
+                    "同义替换": [
+                        "environmentally-friendly"
+                    ]
+                },
+                "elaborate": {
+                    "词义": "v. 详细阐述，详细叙述",
+                    "同义替换": [
+                        "illustrate"
+                    ]
+                },
+                "elderly": {
+                    "词义": "adj. 高龄的",
+                    "同义替换": [
+                        "aged"
+                    ]
+                },
+                "eliminate": {
+                    "词义": "v. 消除，排除",
+                    "同义替换": [
+                        "dispose"
+                    ]
+                },
+                "elusive": {
+                    "词义": "adj. 难懂的，难捉摸的；行踪隐秘的",
+                    "同义替换": [
+                        "hard"
+                    ]
+                },
+                "encyclopaedia": {
+                    "词义": "n. 百科全书",
+                    "同义替换": [
+                        "entire range of knowledge"
+                    ]
+                },
+                "entrepreneur": {
+                    "词义": "n. 企业家",
+                    "同义替换": [
+                        "boss"
+                    ]
+                },
+                "equator": {
+                    "词义": "n. 赤道",
+                    "同义替换": [
+                        "geography"
+                    ]
+                },
+                "erratically": {
+                    "词义": "adv. 不定的，无视规律地",
+                    "同义替换": [
+                        "unpredictably"
+                    ]
+                },
+                "established": {
+                    "词义": "adj. 确定的；已制定的，已建立的",
+                    "同义替换": [
+                        "built"
+                    ]
+                },
+                "estate": {
+                    "词义": "n. 房地产",
+                    "同义替换": [
+                        "property"
+                    ]
+                },
+                "ethical": {
+                    "词义": "adj. 道德的",
+                    "同义替换": [
+                        "moral"
+                    ]
+                },
+                "eventually": {
+                    "词义": "adv. 最后，终于",
+                    "同义替换": [
+                        "finally"
+                    ]
+                },
+                "evidence": {
+                    "词义": "n. 迹象；证据",
+                    "同义替换": [
+                        "proof"
+                    ]
+                },
+                "evolve": {
+                    "词义": "v. 进化，发展；逐渐形成",
+                    "同义替换": [
+                        "develop"
+                    ]
+                },
+                "exhausted": {
+                    "词义": "adj. 疲惫的，耗尽的",
+                    "同义替换": [
+                        "fatigue"
+                    ]
+                },
+                "experiment": {
+                    "词义": "n. 试验，试验",
+                    "同义替换": [
+                        "test"
+                    ]
+                },
+                "exceptional": {
+                    "词义": "adj. 异常的，特别出色的",
+                    "同义替换": [
+                        "extreme",
+                        "utmost"
+                    ]
+                },
+                "explicit": {
+                    "词义": "adj. 明确的",
+                    "同义替换": [
+                        "clear"
+                    ]
+                },
+                "exploit": {
+                    "词义": "v. 开发，利用",
+                    "同义替换": [
+                        "use"
+                    ]
+                },
+                "extend": {
+                    "词义": "v. 扩展，延伸，推广",
+                    "同义替换": [
+                        "expand"
+                    ]
+                },
+                "extract": {
+                    "词义": "n./v. 摘录/提取",
+                    "同义替换": [
+                        "quotation"
+                    ]
+                },
+                "famine": {
+                    "词义": "n. 饥荒",
+                    "同义替换": [
+                        "hunger"
+                    ]
+                },
+                "finite": {
+                    "词义": "adj. 有限的",
+                    "同义替换": [
+                        "limited"
+                    ]
+                },
+                "fitness": {
+                    "词义": "n. 健康的",
+                    "同义替换": [
+                        "health"
+                    ]
+                },
+                "foe": {
+                    "词义": "n. 敌人，危害物",
+                    "同义替换": [
+                        "enemy"
+                    ]
+                },
+                "format": {
+                    "词义": "n. 格式",
+                    "同义替换": [
+                        "structure"
+                    ]
+                },
+                "fragment": {
+                    "词义": "n. 碎片",
+                    "同义替换": [
+                        "piece"
+                    ]
+                },
+                "freeze": {
+                    "词义": "n. 冰冻，冻结",
+                    "同义替换": [
+                        "chill"
+                    ]
+                },
+                "fulfill": {
+                    "词义": "v. 满足，实现",
+                    "同义替换": [
+                        "execute"
+                    ]
+                },
+                "gene": {
+                    "词义": "n. 基因",
+                    "同义替换": [
+                        "factor"
+                    ]
+                },
+                "gifted": {
+                    "词义": "adj. 有天赋的，有才华的",
+                    "同义替换": [
+                        "talented"
+                    ]
+                },
+                "graphic": {
+                    "词义": "adj. 形象的；图解的",
+                    "同义替换": [
+                        "picture"
+                    ]
+                },
+                "habitat": {
+                    "词义": "n. 栖息地，住所",
+                    "同义替换": [
+                        "residence"
+                    ]
+                },
+                "harbor": {
+                    "词义": "v./n. 怀有/海港",
+                    "同义替换": [
+                        "hold"
+                    ]
+                },
+                "hardship": {
+                    "词义": "n. 困苦；苦难",
+                    "同义替换": [
+                        "difficult"
+                    ]
+                },
+                "harsh": {
+                    "词义": "adj. 艰难的；严酷的",
+                    "同义替换": [
+                        "rough"
+                    ]
+                },
+                "hypothesis": {
+                    "词义": "n. 假设",
+                    "同义替换": [
+                        "assumption"
+                    ]
+                },
+                "impact": {
+                    "词义": "n. 影响",
+                    "同义替换": [
+                        "influence"
+                    ]
+                },
+                "impressive": {
+                    "词义": "adj. 感人的；给人深刻印象的",
+                    "同义替换": [
+                        "touching"
+                    ]
+                },
+                "in accordance with": {
+                    "词义": " 依照；与……一致",
+                    "同义替换": [
+                        "conform"
+                    ]
+                },
+                "inaccurate": {
+                    "词义": "adj. 错误的",
+                    "同义替换": [
+                        "incorrect"
+                    ]
+                },
+                "inactive": {
+                    "词义": "adj. 不活跃的，不活动的",
+                    "同义替换": [
+                        "passive"
+                    ]
+                },
+                "inappropriate": {
+                    "词义": "adj. 不适当的",
+                    "同义替换": [
+                        "hard"
+                    ]
+                },
+                "indulge": {
+                    "词义": "v. 沉溺（于）",
+                    "同义替换": [
+                        "spoil"
+                    ]
+                },
+                "infest": {
+                    "词义": "v. 侵害；寄生于",
+                    "同义替换": [
+                        "plague"
+                    ]
+                },
+                "installment": {
+                    "词义": "n. 安装；分期付款",
+                    "同义替换": [
+                        "payment on its completion"
+                    ]
+                },
+                "intelligence": {
+                    "词义": "n. 智力",
+                    "同义替换": [
+                        "mind"
+                    ]
+                },
+                "intense": {
+                    "词义": "adj. 强烈的；紧张的；热情的",
+                    "同义替换": [
+                        "strong"
+                    ]
+                },
+                "interaction": {
+                    "词义": "n. 相互作用，交流互动",
+                    "同义替换": [
+                        "social activities"
+                    ]
+                },
+                "interference": {
+                    "词义": "n. 干涉",
+                    "同义替换": [
+                        "interdependence"
+                    ]
+                },
+                "interior": {
+                    "词义": "n./adj. 内部/内部的",
+                    "同义替换": [
+                        "inner"
+                    ]
+                },
+                "interrupt": {
+                    "词义": "v. 中断",
+                    "同义替换": [
+                        "stop"
+                    ]
+                },
+                "introverted": {
+                    "词义": "adj. 内向的，含蓄的",
+                    "同义替换": [
+                        "shyness"
+                    ]
+                },
+                "involve": {
+                    "词义": "v. 包含，牵涉",
+                    "同义替换": [
+                        "associate"
+                    ]
+                },
+                "keen": {
+                    "词义": "adj. 热切的；强迫的，强烈的",
+                    "同义替换": [
+                        "strong"
+                    ]
+                },
+                "label": {
+                    "词义": "v. 打上标签",
+                    "同义替换": [
+                        "display"
+                    ]
+                },
+                "lack": {
+                    "词义": "v. 缺乏；不足",
+                    "同义替换": [
+                        "shortage"
+                    ]
+                },
+                "landscape": {
+                    "词义": "n. 风景",
+                    "同义替换": [
+                        "scene"
+                    ]
+                },
+                "likelihood": {
+                    "词义": "n. 可能性",
+                    "同义替换": [
+                        "chance"
+                    ]
+                },
+                "limb": {
+                    "词义": "n. 四肢",
+                    "同义替换": [
+                        "arm or leg"
+                    ]
+                },
+                "linguistic": {
+                    "词义": "adj. 语言(学)的",
+                    "同义替换": [
+                        "language"
+                    ]
+                },
+                "log": {
+                    "词义": "v./n. 记录/原木",
+                    "同义替换": [
+                        "record"
+                    ]
+                },
+                "look-in": {
+                    "词义": "n. 成功的机会",
+                    "同义替换": [
+                        "opportunity",
+                        "chance"
+                    ]
+                },
+                "lopsided": {
+                    "词义": "adj. 不平衡的",
+                    "同义替换": [
+                        "uneven"
+                    ]
+                },
+                "mainly": {
+                    "词义": "adv. 主要的，大体",
+                    "同义替换": [
+                        "primarily"
+                    ]
+                },
+                "malfunction": {
+                    "词义": "v. 发生故障;不起作用",
+                    "同义替换": [
+                        "breakdown"
+                    ]
+                },
+                "mammal": {
+                    "词义": "n. 哺乳动物",
+                    "同义替换": [
+                        "creature"
+                    ]
+                },
+                "manage to do": {
+                    "词义": " 设法完成某事",
+                    "同义替换": [
+                        "success"
+                    ]
+                },
+                "manifest": {
+                    "词义": "v. 出现，表现",
+                    "同义替换": [
+                        "obvious"
+                    ]
+                },
+                "manufacture": {
+                    "词义": "n. 生产",
+                    "同义替换": [
+                        "produce"
+                    ]
+                },
+                "marine": {
+                    "词义": "adj. 海产的；航海的；海运的",
+                    "同义替换": [
+                        "sea"
+                    ]
+                },
+                "mate": {
+                    "词义": "n. 配偶",
+                    "同义替换": [
+                        "spouse"
+                    ]
+                },
+                "mechanism": {
+                    "词义": "n. 机制，原理",
+                    "同义替换": [
+                        "method"
+                    ]
+                },
+                "mental": {
+                    "词义": "adj. 精神的，心理的",
+                    "同义替换": [
+                        "intelligent"
+                    ]
+                },
+                "mercury": {
+                    "词义": "n. 汞，水银",
+                    "同义替换": [
+                        "liquid metal"
+                    ]
+                },
+                "meteorological": {
+                    "词义": "adj. 气象学的",
+                    "同义替换": [
+                        "weather"
+                    ]
+                },
+                "migrate": {
+                    "词义": "v. 转移,迁移",
+                    "同义替换": [
+                        "move"
+                    ]
+                },
+                "moisture": {
+                    "词义": "n. 水分，湿度",
+                    "同义替换": [
+                        "humidity"
+                    ]
+                },
+                "monitor": {
+                    "词义": "v. 监控",
+                    "同义替换": [
+                        "surveillance"
+                    ]
+                },
+                "motif": {
+                    "词义": "n. 主题；图形",
+                    "同义替换": [
+                        "theme"
+                    ]
+                },
+                "mould": {
+                    "词义": "v. 模压，塑造；塑造成",
+                    "同义替换": [
+                        "form"
+                    ]
+                },
+                "native": {
+                    "词义": "adj. 本国的，土著的；天然的；天赋的",
+                    "同义替换": [
+                        "original"
+                    ]
+                },
+                "nocturnal": {
+                    "词义": "adj. 夜间的,夜间发生的",
+                    "同义替换": [
+                        "night"
+                    ]
+                },
+                "norm": {
+                    "词义": "n. 规范",
+                    "同义替换": [
+                        "regulation"
+                    ]
+                },
+                "notoriety": {
+                    "词义": "n. 名声",
+                    "同义替换": [
+                        "famous"
+                    ]
+                },
+                "objective": {
+                    "词义": "n./adj. 目标，目的/客观的",
+                    "同义替换": [
+                        "goal"
+                    ]
+                },
+                "obligation": {
+                    "词义": "n. 义务",
+                    "同义替换": [
+                        "responsibility"
+                    ]
+                },
+                "obscure": {
+                    "词义": "v. 掩盖，使模糊不清",
+                    "同义替换": [
+                        "hide"
+                    ]
+                },
+                "obtain": {
+                    "词义": "v. 获得",
+                    "同义替换": [
+                        "get"
+                    ]
+                },
+                "odd": {
+                    "词义": "adj. 古怪的",
+                    "同义替换": [
+                        "strange"
+                    ]
+                },
+                "odour": {
+                    "词义": "n. 气味",
+                    "同义替换": [
+                        "smell"
+                    ]
+                },
+                "offensive": {
+                    "词义": "adj. 冒犯的，无礼的",
+                    "同义替换": [
+                        "hostile"
+                    ]
+                },
+                "official": {
+                    "词义": "n./adj. 官员/官方的",
+                    "同义替换": [
+                        "authority"
+                    ]
+                },
+                "optimum": {
+                    "词义": "n./adj. 最佳效果/最适宜的",
+                    "同义替换": [
+                        "best"
+                    ]
+                },
+                "ordinary": {
+                    "词义": "adj. 普通的；平凡的；平常的",
+                    "同义替换": [
+                        "common"
+                    ]
+                },
+                "organ": {
+                    "词义": "n. 器官；机构",
+                    "同义替换": [
+                        "a part of a body"
+                    ]
+                },
+                "out of the question": {
+                    "词义": " 不可能",
+                    "同义替换": [
+                        "impossible"
+                    ]
+                },
+                "overcome": {
+                    "词义": "v. 克服",
+                    "同义替换": [
+                        "defeat"
+                    ]
+                },
+                "overtake": {
+                    "词义": "v. 赶上",
+                    "同义替换": [
+                        "surpass"
+                    ]
+                },
+                "paralyse": {
+                    "词义": "v. 使……麻痹；使……瘫痪",
+                    "同义替换": [
+                        "cannot move"
+                    ]
+                },
+                "paramount": {
+                    "词义": "adj. 最重要的，主要的",
+                    "同义替换": [
+                        "principal"
+                    ]
+                },
+                "participate": {
+                    "词义": "v. 参加",
+                    "同义替换": [
+                        "join"
+                    ]
+                },
+                "patient": {
+                    "词义": "adj./n. 有耐性的，能容忍的/病人；患者",
+                    "同义替换": [
+                        "repetitive"
+                    ]
+                },
+                "peak": {
+                    "词义": "n./v. 最高峰，顶点/使……达到顶峰",
+                    "同义替换": [
+                        "top"
+                    ]
+                },
+                "permit": {
+                    "词义": "n./v. 许可证，执照/许可",
+                    "同义替换": [
+                        "allow"
+                    ]
+                },
+                "persuade": {
+                    "词义": "v. 说服，劝说",
+                    "同义替换": [
+                        "influence"
+                    ]
+                },
+                "pessimistic": {
+                    "词义": "adj. 悲观的",
+                    "同义替换": [
+                        "negative"
+                    ]
+                },
+                "phase": {
+                    "词义": "n. 阶段",
+                    "同义替换": [
+                        "process"
+                    ]
+                },
+                "physical": {
+                    "词义": "adj. 身体上的；物质的",
+                    "同义替换": [
+                        "body"
+                    ]
+                },
+                "plagiarise": {
+                    "词义": "v. 抄袭",
+                    "同义替换": [
+                        "copy"
+                    ]
+                },
+                "plenty of": {
+                    "词义": " 大量的",
+                    "同义替换": [
+                        "many"
+                    ]
+                },
+                "plot": {
+                    "词义": "v. 密谋",
+                    "同义替换": [
+                        "plan"
+                    ]
+                },
+                "pose": {
+                    "词义": "v. 提出，造成，形成",
+                    "同义替换": [
+                        "cause"
+                    ]
+                },
+                "portable": {
+                    "词义": "adj. 可携带的",
+                    "同义替换": [
+                        "conveyable"
+                    ]
+                },
+                "poverty": {
+                    "词义": "n. 贫穷",
+                    "同义替换": [
+                        "poor"
+                    ]
+                },
+                "praise": {
+                    "词义": "n. 赞扬",
+                    "同义替换": [
+                        "commend"
+                    ]
+                },
+                "predict": {
+                    "词义": "v. 预测，预知",
+                    "同义替换": [
+                        "expect"
+                    ]
+                },
+                "pressing": {
+                    "词义": "adj. 迫切的",
+                    "同义替换": [
+                        "urgent"
+                    ]
+                },
+                "private": {
+                    "词义": "adj. 私人的；私有的；私下的",
+                    "同义替换": [
+                        "personal"
+                    ]
+                },
+                "prohibit": {
+                    "词义": "v. 禁止的",
+                    "同义替换": [
+                        "not allowed"
+                    ]
+                },
+                "prolong": {
+                    "词义": "v. 拉长，延长",
+                    "同义替换": [
+                        "extend"
+                    ]
+                },
+                "promote": {
+                    "词义": "v. 促进，推销",
+                    "同义替换": [
+                        "improve"
+                    ]
+                },
+                "prosper": {
+                    "词义": "v. 使成功，使繁荣",
+                    "同义替换": [
+                        "success"
+                    ]
+                },
+                "purify": {
+                    "词义": "v. 净化",
+                    "同义替换": [
+                        "clean"
+                    ]
+                },
+                "qualify": {
+                    "词义": "v. 取得资格",
+                    "同义替换": [
+                        "fulfill"
+                    ]
+                },
+                "radical": {
+                    "词义": "adj. 彻底的，根本的",
+                    "同义替换": [
+                        "utmost"
+                    ]
+                },
+                "range": {
+                    "词义": "n. 范围；幅度",
+                    "同义替换": [
+                        "scope"
+                    ]
+                },
+                "rare": {
+                    "词义": "adj. 稀有的",
+                    "同义替换": [
+                        "unusual"
+                    ]
+                },
+                "rate": {
+                    "词义": "n./v. 等级/评估",
+                    "同义替换": [
+                        "rank",
+                        "measure"
+                    ]
+                },
+                "react": {
+                    "词义": "v. 反应",
+                    "同义替换": [
+                        "respond"
+                    ]
+                },
+                "recreation": {
+                    "词义": "n. 娱乐，消遣",
+                    "同义替换": [
+                        "entertainment"
+                    ]
+                },
+                "reduction": {
+                    "词义": "n. 下降，减少",
+                    "同义替换": [
+                        "decrease"
+                    ]
+                },
+                "refer to": {
+                    "词义": " 指(的是)，涉及，提及",
+                    "同义替换": [
+                        "talk about"
+                    ]
+                },
+                "rehearsal": {
+                    "词义": "n. 排演；预演；练习",
+                    "同义替换": [
+                        "preparation"
+                    ]
+                },
+                "reject": {
+                    "词义": "v. 拒绝，排斥，丢弃",
+                    "同义替换": [
+                        "exclude"
+                    ]
+                },
+                "relevant": {
+                    "词义": "adj. 相关的",
+                    "同义替换": [
+                        "relative"
+                    ]
+                },
+                "religious": {
+                    "词义": "adj. 宗教的；虔诚的",
+                    "同义替换": [
+                        "sacred"
+                    ]
+                },
+                "reluctant": {
+                    "词义": "adj. 不情愿的",
+                    "同义替换": [
+                        "unwilling"
+                    ]
+                },
+                "reproduce": {
+                    "词义": "v. 繁殖",
+                    "同义替换": [
+                        "breed"
+                    ]
+                },
+                "responsible": {
+                    "词义": "adj. 负责的，可靠的；有责任的",
+                    "同义替换": [
+                        "liable"
+                    ]
+                },
+                "revision": {
+                    "词义": "n. 修正",
+                    "同义替换": [
+                        "editing"
+                    ]
+                },
+                "revive": {
+                    "词义": "v. 使复苏，恢复",
+                    "同义替换": [
+                        "renaissance"
+                    ]
+                },
+                "ruin": {
+                    "词义": "v. 毁灭",
+                    "同义替换": [
+                        "destroy"
+                    ]
+                },
+                "scenic": {
+                    "词义": "adj. 风景优美的",
+                    "同义替换": [
+                        "beautiful"
+                    ]
+                },
+                "shade": {
+                    "词义": "n. 遮阳；阴影",
+                    "同义替换": [
+                        "shelter"
+                    ]
+                },
+                "skepticism": {
+                    "词义": "n. 怀疑",
+                    "同义替换": [
+                        "doubt"
+                    ]
+                },
+                "soar": {
+                    "词义": "v. 激增",
+                    "同义替换": [
+                        "increase"
+                    ]
+                },
+                "solely": {
+                    "词义": "adv. 唯一地",
+                    "同义替换": [
+                        "alone"
+                    ]
+                },
+                "solicitor": {
+                    "词义": "n. 律师",
+                    "同义替换": [
+                        "lawyer"
+                    ]
+                },
+                "steer": {
+                    "词义": "v. 控制，引导",
+                    "同义替换": [
+                        "manage"
+                    ]
+                },
+                "stimulate": {
+                    "词义": "v. 刺激，激励",
+                    "同义替换": [
+                        "motivate"
+                    ]
+                },
+                "stride": {
+                    "词义": "n. 进展",
+                    "同义替换": [
+                        "progress"
+                    ]
+                },
+                "succumb": {
+                    "词义": "vi. 屈服",
+                    "同义替换": [
+                        "yield"
+                    ]
+                },
+                "subdivide": {
+                    "词义": "v. 把……细分",
+                    "同义替换": [
+                        "break down"
+                    ]
+                },
+                "subtle": {
+                    "词义": "adj. 微妙的",
+                    "同义替换": [
+                        "delicate"
+                    ]
+                },
+                "substance": {
+                    "词义": "n. 物质；实质",
+                    "同义替换": [
+                        "matter"
+                    ]
+                },
+                "sufficiency": {
+                    "词义": "n. 足量，充足",
+                    "同义替换": [
+                        "enough"
+                    ]
+                },
+                "supersede": {
+                    "词义": "v. 取代，代替",
+                    "同义替换": [
+                        "replace"
+                    ]
+                },
+                "suppress": {
+                    "词义": "v. 抑制，隐瞒",
+                    "同义替换": [
+                        "hold"
+                    ]
+                },
+                "supremacy": {
+                    "词义": "n. 至高无上，很高的地位",
+                    "同义替换": [
+                        "priority"
+                    ]
+                },
+                "suspicious": {
+                    "词义": "adj. 可疑的",
+                    "同义替换": [
+                        "odd"
+                    ]
+                },
+                "sustainable": {
+                    "词义": "adj. 可持续的",
+                    "同义替换": [
+                        "long-term"
+                    ]
+                },
+                "symptom": {
+                    "词义": "n. 症状，征兆",
+                    "同义替换": [
+                        "sign"
+                    ]
+                },
+                "tension": {
+                    "词义": "n. 紧张，不安",
+                    "同义替换": [
+                        "upset"
+                    ]
+                },
+                "term": {
+                    "词义": "n. 术语",
+                    "同义替换": [
+                        "word"
+                    ]
+                },
+                "throughout": {
+                    "词义": "adv. 自始至终，到处；全部",
+                    "同义替换": [
+                        "anywhere"
+                    ]
+                },
+                "toll": {
+                    "词义": "n./v. 通行费/征收",
+                    "同义替换": [
+                        "charge"
+                    ]
+                },
+                "trace": {
+                    "词义": "n. 追溯；痕迹",
+                    "同义替换": [
+                        "track"
+                    ]
+                },
+                "transcend": {
+                    "词义": "v. 胜过，超越",
+                    "同义替换": [
+                        "excel"
+                    ]
+                },
+                "transit": {
+                    "词义": "n./v. 运输；经过/运送",
+                    "同义替换": [
+                        "send"
+                    ]
+                },
+                "tremendous": {
+                    "词义": "adj. 巨大的，惊人的",
+                    "同义替换": [
+                        "vast"
+                    ]
+                },
+                "trigger": {
+                    "词义": "n. 触发，引发，引起",
+                    "同义替换": [
+                        "begin"
+                    ]
+                },
+                "tropical": {
+                    "词义": "adj. 热带的",
+                    "同义替换": [
+                        "hot"
+                    ]
+                },
+                "unbiased": {
+                    "词义": "adj. 公正的，无偏见的",
+                    "同义替换": [
+                        "fair"
+                    ]
+                },
+                "uniform": {
+                    "词义": "adj. 始终如一的",
+                    "同义替换": [
+                        "consistent"
+                    ]
+                },
+                "valuable": {
+                    "词义": "adj. 宝贵的，有价值的",
+                    "同义替换": [
+                        "benefit"
+                    ]
+                },
+                "versatile": {
+                    "词义": "adj. 多功能",
+                    "同义替换": [
+                        "all-around"
+                    ]
+                },
+                "view": {
+                    "词义": "v. 看",
+                    "同义替换": [
+                        "overlook"
+                    ]
+                },
+                "violent": {
+                    "词义": "adj. 暴力的；猛烈的",
+                    "同义替换": [
+                        "fierce"
+                    ]
+                },
+                "visible": {
+                    "词义": "adj. 明显的，看得见的",
+                    "同义替换": [
+                        "see"
+                    ]
+                },
+                "visual": {
+                    "词义": "adj. 视觉的",
+                    "同义替换": [
+                        "image"
+                    ]
+                },
+                "well-being": {
+                    "词义": "n. 健康，康乐",
+                    "同义替换": [
+                        "health"
+                    ]
+                }
             }
         };
 
@@ -1001,9 +2535,9 @@
         // 切换数据集
         function switchDataset() {
             currentDataset = currentDataset === 'A' ? 'B' : 'A';
-            document.getElementById('datasetTag').textContent = `当前数据集：${currentDataset}`;
+            document.getElementById('datasetTag').textContent = `第 ${currentDataset === 'A' ? `1 & 2` : '3'} 类考点词`;
             document.querySelector('.dataset-switcher').textContent = 
-                `切换至数据集${currentDataset === 'A' ? 'B' : 'A'}`;
+                `训练第 ${currentDataset === 'A' ? '3' : `1 & 2`} 类考点词`;
             
             // 重置所有训练状态
             initCandidatePool();
