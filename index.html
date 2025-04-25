@@ -143,8 +143,17 @@
 
         // 准备训练批次
         function prepareBatch() {
-            // 取出当前批次
-            currentBatch = candidatePool.splice(0, 3);
+            // 随机选取3个不同单词
+            const selectedIndexes = new Set();
+            while(selectedIndexes.size < 3) {
+                const randomIndex = Math.floor(Math.random() * candidatePool.length);
+                selectedIndexes.add(randomIndex);
+            }
+            
+            // 按降序删除避免索引错位
+            currentBatch = Array.from(selectedIndexes)
+                .sort((a,b) => b - a)
+                .map(i => candidatePool.splice(i, 1)[0]);
             
             // 补充新单词
             refillCandidatePool();
