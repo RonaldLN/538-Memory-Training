@@ -68,10 +68,29 @@
             gap: 15px;
             margin-top: 20px;
         }
+        .marker-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        .marker-btn {
+            background: #ff9800;
+            padding: 8px 16px;
+        }
+        .marker-btn.active {
+            background: #f57c00;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #ff9800;
+        }
     </style>
 </head>
 <body>
     <div class="current-words" id="currentWords"></div>
+    <div class="marker-buttons">
+        <button class="marker-btn" onclick="selectMarker(1)">标记单词1</button>
+        <button class="marker-btn" onclick="selectMarker(2)">标记单词2</button>
+        <button class="marker-btn" onclick="selectMarker(3)">标记单词3</button>
+    </div>
     <div class="options-grid" id="optionsGrid"></div>
     
     <div class="button-group">
@@ -94,6 +113,7 @@
         let allSynonyms = [];
         let userAnswers = {};
         let isAnswerChecked = false; // 新增状态标记
+        let currentMarker = 0; // 0表示未选择标记器
 
         // 初始化候选池
         function initCandidatePool() {
@@ -129,10 +149,25 @@
 
             // 重置界面状态
             isAnswerChecked = false;
+            currentMarker = 0;
             userAnswers = {};
             document.getElementById('submitBtn').style.display = 'inline-block';
             document.getElementById('nextBtn').style.display = 'none';
+            updateMarkerButtons();
             renderInterface();
+        }
+
+        // 更新标记按钮状态
+        function updateMarkerButtons() {
+            document.querySelectorAll('.marker-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent === `标记单词${currentMarker}`);
+            });
+        }
+
+        // 选择标记器
+        function selectMarker(markerNumber) {
+            currentMarker = currentMarker === markerNumber ? 0 : markerNumber;
+            updateMarkerButtons();
         }
 
         // 渲染界面
@@ -151,14 +186,26 @@
             // 生成选项
             const optionsContainer = document.getElementById('optionsGrid');
             optionsContainer.innerHTML = allSynonyms.map((syn, index) => {
-                const selected = userAnswers[index] || '';
-                return `<div class="option-item ${selected}" 
+                const mark = userAnswers[index] || '';
+                return `<div class="option-item ${mark ? 'selected' : ''}" 
                           data-index="${index}"
-                          onclick="toggleAnswer(${index})">
+                          onclick="handleOptionClick(${index})">
                     ${syn}
-                    ${selected ? `<div>${selected}</div>` : ''}
+                    ${mark ? `<div>${mark}</div>` : ''}
                 </div>`;
             }).join('');
+        }
+
+        // 处理选项点击
+        function handleOptionClick(index) {
+            if(isAnswerChecked || !currentMarker) return;
+            
+            if(userAnswers[index] === currentMarker) {
+                delete userAnswers[index];
+            } else {
+                userAnswers[index] = currentMarker;
+            }
+            renderInterface();
         }
 
         // 切换词义显示
@@ -170,22 +217,11 @@
             button.textContent = definition.style.display === 'none' ? '显示词义' : '隐藏词义';
         }
 
-        // 切换答案选择
-        function toggleAnswer(index) {
-            if(isAnswerChecked) return; // 已提交时阻止操作
-            if(!userAnswers[index]) {
-                userAnswers[index] = 1;
-            } else if(userAnswers[index] < 3) {
-                userAnswers[index]++;
-            } else {
-                delete userAnswers[index];
-            }
-            renderInterface();
-        }
-
         // 检查答案
         function checkAnswers() {
             isAnswerChecked = true; // 设置已检查状态
+            currentMarker = 0;
+            updateMarkerButtons();
             
             // 获取正确答案映射
             const correctMap = currentBatch.reduce((acc, word, wordIndex) => {
