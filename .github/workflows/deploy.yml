@@ -1,0 +1,42 @@
+name: Deploy to gh-pages
+
+on:
+  push:
+    branches:
+      - main  # 如果你的主分支是master，请改为master
+
+permissions:
+  contents: write
+
+jobs:
+  minify-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+
+    - name: Install HTML minifier
+      run: npm install html-minifier-terser -g
+
+    - name: Minify HTML
+      run: |
+        mkdir output
+        html-minifier-terser \
+          --collapse-whitespace \
+          --remove-comments \
+          --minify-css true \
+          --minify-js true \
+          index.html -o output/index.html
+
+    - name: Deploy to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./output
+        force_orphan: true  # 保持gh-pages分支历史清洁
