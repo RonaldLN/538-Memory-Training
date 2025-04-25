@@ -93,6 +93,7 @@
         let currentBatch = [];
         let allSynonyms = [];
         let userAnswers = {};
+        let isAnswerChecked = false; // 新增状态标记
 
         // 初始化候选池
         function initCandidatePool() {
@@ -127,6 +128,7 @@
             ).sort(() => Math.random() - 0.5);
 
             // 重置界面状态
+            isAnswerChecked = false;
             userAnswers = {};
             document.getElementById('submitBtn').style.display = 'inline-block';
             document.getElementById('nextBtn').style.display = 'none';
@@ -170,6 +172,7 @@
 
         // 切换答案选择
         function toggleAnswer(index) {
+            if(isAnswerChecked) return; // 已提交时阻止操作
             if(!userAnswers[index]) {
                 userAnswers[index] = 1;
             } else if(userAnswers[index] < 3) {
@@ -182,6 +185,8 @@
 
         // 检查答案
         function checkAnswers() {
+            isAnswerChecked = true; // 设置已检查状态
+            
             // 获取正确答案映射
             const correctMap = currentBatch.reduce((acc, word, wordIndex) => {
                 wordData[word].同义替换.forEach(syn => {
