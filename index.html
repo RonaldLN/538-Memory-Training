@@ -114,22 +114,40 @@
         let userAnswers = {};
         let isAnswerChecked = false; // 新增状态标记
         let currentMarker = 0; // 0表示未选择标记器
+        let currentPosition = 0;
 
         // 初始化候选池
         function initCandidatePool() {
             const words = Object.keys(wordData);
-            const startIndex = Math.floor(Math.random() * words.length);
+            currentPosition = Math.floor(Math.random() * words.length);
             candidatePool = [];
             
+            // 初始填充10个单词
             for(let i=0; i<10; i++) {
-                const index = (startIndex + i) % words.length;
+                const index = (currentPosition + i) % words.length;
                 candidatePool.push(words[index]);
+            }
+            currentPosition = (currentPosition + 10) % words.length;
+        }
+
+        // 补充候选池
+        function refillCandidatePool() {
+            const words = Object.keys(wordData);
+            // 每次补充3个新单词
+            for(let i=0; i<3; i++) {
+                const index = currentPosition % words.length;
+                candidatePool.push(words[index]);
+                currentPosition = (currentPosition + 1) % words.length;
             }
         }
 
         // 准备训练批次
         function prepareBatch() {
+            // 取出当前批次
             currentBatch = candidatePool.splice(0, 3);
+            
+            // 补充新单词
+            refillCandidatePool();
             
             // 收集正确选项
             const correctOptions = currentBatch.flatMap(word => 
