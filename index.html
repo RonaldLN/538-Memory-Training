@@ -43,6 +43,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin: 0 5px;
         }
         .current-words {
             display: flex;
@@ -54,13 +55,29 @@
             border: 2px solid #2196F3;
             border-radius: 8px;
             flex: 1;
+            text-align: center;
+        }
+        .definition-btn {
+            background: #4CAF50;
+            padding: 6px 12px;
+            font-size: 0.9em;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="current-words" id="currentWords"></div>
     <div class="options-grid" id="optionsGrid"></div>
-    <button onclick="checkAnswers()">提交答案</button>
+    
+    <div class="button-group">
+        <button onclick="checkAnswers()" id="submitBtn">提交答案</button>
+        <button onclick="prepareBatch()" id="nextBtn" style="display: none;">下一组</button>
+    </div>
 
     <script>
         // 示例数据 - 需要替换为完整数据
@@ -109,6 +126,10 @@
                     .slice(0, 30 - correctOptions.length)
             ).sort(() => Math.random() - 0.5);
 
+            // 重置界面状态
+            userAnswers = {};
+            document.getElementById('submitBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'none';
             renderInterface();
         }
 
@@ -120,7 +141,8 @@
                 <div class="word-card">
                     <h3>单词 ${index+1}</h3>
                     <div>${word}</div>
-                    <small>${wordData[word].词义}</small>
+                    <button class="definition-btn" onclick="toggleDefinition(${index})">显示词义</button>
+                    <small style="display: none;">${wordData[word].词义}</small>
                 </div>
             `).join('');
 
@@ -135,6 +157,15 @@
                     ${selected ? `<div>${selected}</div>` : ''}
                 </div>`;
             }).join('');
+        }
+
+        // 切换词义显示
+        function toggleDefinition(index) {
+            const wordCard = document.querySelectorAll('.word-card')[index];
+            const definition = wordCard.querySelector('small');
+            const button = wordCard.querySelector('button');
+            definition.style.display = definition.style.display === 'none' ? 'block' : 'none';
+            button.textContent = definition.style.display === 'none' ? '显示词义' : '隐藏词义';
         }
 
         // 切换答案选择
@@ -176,12 +207,9 @@
                 }
             });
 
-            // 准备下一批
-            setTimeout(() => {
-                userAnswers = {};
-                if(candidatePool.length < 3) initCandidatePool();
-                prepareBatch();
-            }, 3000);
+            // 切换按钮状态
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
         }
 
         // 初始化启动
